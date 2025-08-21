@@ -13,6 +13,8 @@
 // ============================================================================
 // CONSTANTS AND MACROS
 // ============================================================================
+#define MAX_PRODUCTS 100
+
 #define PRODUCTS_FILE "products.dat"
 #define SALES_FILE "sales.dat"
 #define INDEX_FILE "product_index.dat"
@@ -114,7 +116,16 @@ void viewAllSales(void);
 // Search & Sort Functions
 void searchProductByName(void);
 void searchByCategory(void);
-void sortProductsByPrice(void);
+// void sortProductsByPrice(void);
+
+void sortingMenu();
+void viewProductsSortedByID();
+void viewProductsSortedByPrice();
+void viewProductsSortedByPriceDesc();
+void viewProductsSortedByName();
+void viewProductsSortedByStock();
+void permanentSortByID();
+void permanentSortByPrice();
 
 // Reports & Analytics
 void lowStockReport(void);

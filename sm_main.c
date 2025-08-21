@@ -26,23 +26,30 @@ void exportMenu(void) {
     } while (choice != 0);
 }
 
-void inventoryMenu(void) {
+// ===== UPDATE YOUR EXISTING inventoryMenu() FUNCTION =====
+void inventoryMenu() {
     int choice;
     
-    do {
-        printf("\n=== INVENTORY MANAGEMENT ===\n");
-        printf("1. Add New Product\n");
+    while (1) {
+        system("cls");
+        printf("\n====================================\n");
+        printf("|        INVENTORY MANAGEMENT      |\n");
+        printf("====================================\n");
+        printf("1. Add Product\n");
         printf("2. View All Products\n");
         printf("3. Update Product\n");
         printf("4. Delete Product\n");
         printf("5. Search Product by Name\n");
         printf("6. Search by Category\n");
-        printf("7. Sort Products by Price\n");
+        printf("7. 🔢 Sorting & View Options\n");         // Updated with icon
         printf("8. Set Product Discount\n");
-        printf("9. View Active Promotions\n");
+        printf("9. View Promotions\n");
         printf("0. Back to Main Menu\n");
-        printf("Enter choice: ");
+        printf("\n====================================\n");
+        printf("Enter your choice: ");
+        
         scanf("%d", &choice);
+        getchar();
         
         switch (choice) {
             case 1: addProduct(); break;
@@ -51,13 +58,16 @@ void inventoryMenu(void) {
             case 4: deleteProduct(); break;
             case 5: searchProductByName(); break;
             case 6: searchByCategory(); break;
-            case 7: sortProductsByPrice(); break;
+            case 7: sortingMenu(); break;              // Call the new sorting menu
             case 8: setProductDiscount(); break;
             case 9: viewPromotions(); break;
-            case 0: break;
-            default: printf("Invalid choice!\n");
+            case 0: return;
+            default: 
+                printf("\n❌ Invalid choice! Please try again.\n");
+                printf("Press any key to continue...");
+                getchar();
         }
-    } while (choice != 0);
+    }
 }
 
 void salesMenu(void) {

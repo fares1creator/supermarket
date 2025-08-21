@@ -906,7 +906,7 @@ void searchByCategory(void) {
     }
 }
 
-void sortProductsByPrice(void) {
+/* void sortProductsByPrice(void) {
     int choice;
     printf("\n=== SORT BY PRICE ===\n");
     printf("1. Ascending (Low to High)\n");
@@ -938,6 +938,424 @@ void sortProductsByPrice(void) {
     printf("\nProducts sorted by price:\n");
     viewAllProducts();
 }
+ */
+
+
+// Main sorting menu
+void sortingMenu() {
+    int choice;
+    
+    while (1) {
+        system("cls");
+        printf("\n====================================\n");
+        printf("|         SORTING OPTIONS          |\n");
+        printf("====================================\n");
+        printf("1. View Products by ID (Original Order)\n");
+        printf("2. View Products by Price (Low to High)\n");
+        printf("3. View Products by Price (High to Low)\n");
+        printf("4. View Products by Name (A-Z)\n");
+        printf("5. View Products by Stock (Low to High)\n");
+        printf("6. Permanently Sort by ID\n");
+        printf("7. Permanently Sort by Price\n");
+        printf("0. Back to Inventory Menu\n");
+        printf("\n===================================\n");
+        printf("Enter your choice: ");
+        
+        scanf("%d", &choice);
+        getchar(); // consume newline
+        
+        switch (choice) {
+            case 1: viewProductsSortedByID(); break;
+            case 2: viewProductsSortedByPrice(); break;
+            case 3: viewProductsSortedByPriceDesc(); break;
+            case 4: viewProductsSortedByName(); break;
+            case 5: viewProductsSortedByStock(); break;
+            case 6: permanentSortByID(); break;
+            case 7: permanentSortByPrice(); break;
+            case 0: return;
+            default: 
+                printf("\n❌ Invalid choice! Please try again.\n");
+                printf("Press any key to continue...");
+                getchar();
+        }
+    }
+}
+
+// View products sorted by ID (temporary sort)
+void viewProductsSortedByID() {
+    printf("\n====================================\n");
+    printf("|    PRODUCTS SORTED BY ID         |\n");
+    printf("====================================\n");
+    
+    if (productCount == 0) {
+        printf("📦 No products available.\n");
+        printf("Press any key to continue...");
+        getchar();
+        return;
+    }
+    
+    // Create a temporary copy for sorting
+    Product tempProducts[MAX_PRODUCTS];
+    for (int i = 0; i < productCount; i++) {
+        tempProducts[i] = productCache[i];
+    }
+    
+    // Sort the temporary array by ID
+    for (int i = 0; i < productCount - 1; i++) {
+        for (int j = 0; j < productCount - i - 1; j++) {
+            if (tempProducts[j].productID > tempProducts[j + 1].productID) {
+                Product temp = tempProducts[j];
+                tempProducts[j] = tempProducts[j + 1];
+                tempProducts[j + 1] = temp;
+            }
+        }
+    }
+    
+    // Display sorted products
+    printf("\n%-5s %-20s %-15s %-12s %-8s %-10s\n", 
+           "ID", "Name", "Category", "unitPrice", "Stock", "Discount%");
+    printf("─────────────────────────────────────────────────────────────────────────\n");
+    
+    for (int i = 0; i < productCount; i++) {
+        double finalPrice = tempProducts[i].unitPrice * (1 - tempProducts[i].discountPercent / 100.0);
+        printf("%-5d %-20s %-15s $%-11.2f %-8d %-10.1f\n",
+               tempProducts[i].productID,
+               tempProducts[i].name,
+               tempProducts[i].category,
+               finalPrice,
+               tempProducts[i].quantityInStock,
+               tempProducts[i].discountPercent);
+    }
+    
+    printf("\n💡 Note: This is a temporary view. Original data order unchanged.\n");
+    printf("Total Products: %d\n", productCount);
+    printf("\nPress any key to continue...");
+    getchar();
+}
+
+// View products sorted by price (low to high)
+void viewProductsSortedByPrice() {
+    printf("\n====================================\n");
+    printf("|   PRODUCTS BY PRICE (LOW→HIGH)   \n");
+    printf("====================================\n");
+    
+    if (productCount == 0) {
+        printf("📦 No products available.\n");
+        printf("Press any key to continue...");
+        getchar();
+        return;
+    }
+    
+    // Create temporary copy for sorting
+    Product tempProducts[MAX_PRODUCTS];
+    for (int i = 0; i < productCount; i++) {
+        tempProducts[i] = productCache[i];
+    }
+    
+    // Sort by price (low to high)
+    for (int i = 0; i < productCount - 1; i++) {
+        for (int j = 0; j < productCount - i - 1; j++) {
+            double price1 = tempProducts[j].unitPrice * (1 - tempProducts[j].discountPercent / 100.0);
+            double price2 = tempProducts[j + 1].unitPrice * (1 - tempProducts[j + 1].discountPercent / 100.0);
+            
+            if (price1 > price2) {
+                Product temp = tempProducts[j];
+                tempProducts[j] = tempProducts[j + 1];
+                tempProducts[j + 1] = temp;
+            }
+        }
+    }
+    
+    // Display
+    printf("\n%-5s %-20s %-15s %-12s %-8s %-10s\n", 
+           "ID", "Name", "Category", "Price", "Stock", "Discount%");
+    printf("─────────────────────────────────────────────────────────────────────────\n");
+    
+    for (int i = 0; i < productCount; i++) {
+        double finalPrice = tempProducts[i].unitPrice * (1 - tempProducts[i].discountPercent / 100.0);
+        printf("%-5d %-20s %-15s $%-11.2f %-8d %-10.1f\n",
+               tempProducts[i].productID, tempProducts[i].name, tempProducts[i].category,
+               finalPrice, tempProducts[i].quantityInStock, tempProducts[i].discountPercent);
+    }
+    
+    printf("\n💡 Note: Prices shown include discounts. Original data unchanged.\n");
+    printf("Press any key to continue...");
+    getchar();
+}
+
+// View products sorted by price (high to low)
+void viewProductsSortedByPriceDesc() {
+    printf("\n====================================\n");
+    printf("   PRODUCTS BY PRICE (HIGH→LOW)   \n");
+    printf("====================================\n");
+    
+    if (productCount == 0) {
+        printf("📦 No products available.\n");
+        printf("Press any key to continue...");
+        getchar();
+        return;
+    }
+    
+    // Create temporary copy and sort descending
+    Product tempProducts[MAX_PRODUCTS];
+    for (int i = 0; i < productCount; i++) {
+        tempProducts[i] = productCache[i];
+    }
+    
+    // Sort by price (high to low)
+    for (int i = 0; i < productCount - 1; i++) {
+        for (int j = 0; j < productCount - i - 1; j++) {
+            double price1 = tempProducts[j].unitPrice * (1 - tempProducts[j].discountPercent / 100.0);
+            double price2 = tempProducts[j + 1].unitPrice * (1 - tempProducts[j + 1].discountPercent / 100.0);
+            
+            if (price1 < price2) {
+                Product temp = tempProducts[j];
+                tempProducts[j] = tempProducts[j + 1];
+                tempProducts[j + 1] = temp;
+            }
+        }
+    }
+    
+    // Display
+    printf("\n%-5s %-20s %-15s %-12s %-8s %-10s\n", 
+           "ID", "Name", "Category", "Price", "Stock", "Discount%");
+    printf("─────────────────────────────────────────────────────────────────────────\n");
+    
+    for (int i = 0; i < productCount; i++) {
+        double finalPrice = tempProducts[i].unitPrice * (1 - tempProducts[i].discountPercent / 100.0);
+        printf("%-5d %-20s %-15s $%-11.2f %-8d %-10.1f\n",
+               tempProducts[i].productID, tempProducts[i].name, tempProducts[i].category,
+               finalPrice, tempProducts[i].quantityInStock, tempProducts[i].discountPercent);
+    }
+    
+    printf("\n💰 Showing highest priced items first. Original data unchanged.\n");
+    printf("Press any key to continue...");
+    getchar();
+}
+
+// View products sorted by name (A-Z)
+void viewProductsSortedByName() {
+    printf("\n====================================\n");
+    printf("    PRODUCTS SORTED BY NAME       \n");
+    printf("====================================\n");
+    
+    if (productCount == 0) {
+        printf("📦 No products available.\n");
+        printf("Press any key to continue...");
+        getchar();
+        return;
+    }
+    
+    // Create temporary copy and sort by name
+    Product tempProducts[MAX_PRODUCTS];
+    for (int i = 0; i < productCount; i++) {
+        tempProducts[i] = productCache[i];
+    }
+    
+    // Sort by name (A-Z)
+    for (int i = 0; i < productCount - 1; i++) {
+        for (int j = 0; j < productCount - i - 1; j++) {
+            if (strcmp(tempProducts[j].name, tempProducts[j + 1].name) > 0) {
+                Product temp = tempProducts[j];
+                tempProducts[j] = tempProducts[j + 1];
+                tempProducts[j + 1] = temp;
+            }
+        }
+    }
+    
+    // Display
+    printf("\n%-5s %-20s %-15s %-12s %-8s %-10s\n", 
+           "ID", "Name", "Category", "Price", "Stock", "Discount%");
+    printf("─────────────────────────────────────────────────────────────────────────\n");
+    
+    for (int i = 0; i < productCount; i++) {
+        double finalPrice = tempProducts[i].unitPrice * (1 - tempProducts[i].discountPercent / 100.0);
+        printf("%-5d %-20s %-15s $%-11.2f %-8d %-10.1f\n",
+               tempProducts[i].productID, tempProducts[i].name, tempProducts[i].category,
+               finalPrice, tempProducts[i].quantityInStock, tempProducts[i].discountPercent);
+    }
+    
+    printf("\n🔤 Sorted alphabetically A-Z. Original data unchanged.\n");
+    printf("Press any key to continue...");
+    getchar();
+}
+
+// View products sorted by stock (low to high)
+void viewProductsSortedByStock() {
+    printf("\n====================================\n");
+    printf(" | PRODUCTS BY STOCK (LOW→HIGH)   |\n");
+    printf("====================================\n");
+    
+    if (productCount == 0) {
+        printf("📦 No products available.\n");
+        printf("Press any key to continue...");
+        getchar();
+        return;
+    }
+    
+    // Create temporary copy and sort by stock
+    Product tempProducts[MAX_PRODUCTS];
+    for (int i = 0; i < productCount; i++) {
+        tempProducts[i] = productCache[i];
+    }
+    
+    // Sort by stock (low to high)
+    for (int i = 0; i < productCount - 1; i++) {
+        for (int j = 0; j < productCount - i - 1; j++) {
+            if (tempProducts[j].quantityInStock > tempProducts[j + 1].quantityInStock) {
+                Product temp = tempProducts[j];
+                tempProducts[j] = tempProducts[j + 1];
+                tempProducts[j + 1] = temp;
+            }
+        }
+    }
+    
+    // Display with stock level indicators
+    printf("\n%-5s %-20s %-15s %-12s %-8s %-10s %-10s\n", 
+           "ID", "Name", "Category", "Price", "Stock", "Discount%", "Status");
+    printf("─────────────────────────────────────────────────────────────────────────────────\n");
+    
+    for (int i = 0; i < productCount; i++) {
+        double finalPrice = tempProducts[i].unitPrice * (1 - tempProducts[i].discountPercent / 100.0);
+        
+        // Determine stock status
+        char status[20];
+        if (tempProducts[i].quantityInStock == 0) {
+            strcpy(status, "❌ OUT");
+        } else if (tempProducts[i].quantityInStock <= 10) {
+            strcpy(status, "⚠️ LOW");
+        } else if (tempProducts[i].quantityInStock <= 50) {
+            strcpy(status, "✅ OK");
+        } else {
+            strcpy(status, "💚 HIGH");
+        }
+        
+        printf("%-5d %-20s %-15s $%-11.2f %-8d %-10.1f %-10s\n",
+               tempProducts[i].productID, tempProducts[i].name, tempProducts[i].category,
+               finalPrice, tempProducts[i].quantityInStock, tempProducts[i].discountPercent, status);
+    }
+    
+    printf("\n📊 Sorted by stock level (lowest first). Check for reorder needs!\n");
+    printf("Press any key to continue...");
+    getchar();
+}
+
+// Permanently sort by ID
+void permanentSortByID() {
+    printf("\n====================================\n");
+    printf("|     PERMANENT SORT BY ID         |\n");
+    printf("====================================\n");
+    
+    if (productCount <= 1) {
+        printf("📦 No products to sort or only one product available.\n");
+        printf("Press any key to continue...");
+        getchar();
+        return;
+    }
+    
+    printf("⚠️  WARNING: This will permanently change your data order!\n");
+    printf("📋 Current product count: %d\n", productCount);
+    printf("💾 This change will be saved to your data file.\n");
+    printf("\nAre you sure you want to permanently sort by ID? (y/N): ");
+    
+    char confirm;
+    scanf("%c", &confirm);
+    getchar();
+    
+    if (confirm == 'y' || confirm == 'Y') {
+        printf("\n🔄 Sorting products by ID...\n");
+        
+        // Sort by product ID
+        for (int i = 0; i < productCount - 1; i++) {
+            for (int j = 0; j < productCount - i - 1; j++) {
+                if (productCache[j].productID > productCache[j + 1].productID) {
+                    // Swap products
+                    Product temp = productCache[j];
+                    productCache[j] = productCache[j + 1];
+                    productCache[j + 1] = temp;
+                }
+            }
+        }
+        
+        // Save to file
+        saveProductsFromCache();
+        
+        printf("✅ Products permanently sorted by ID and saved!\n");
+    } else {
+        printf("❌ Sort operation cancelled.\n");
+    }
+    
+    printf("Press any key to continue...");
+    getchar();
+}
+
+// Permanently sort by price
+void permanentSortByPrice() {
+    printf("\n====================================\n");
+    printf("|    PERMANENT SORT BY PRICE       |\n");
+    printf("====================================\n");
+    
+    if (productCount <= 1) {
+        printf("📦 No products to sort or only one product available.\n");
+        printf("Press any key to continue...");
+        getchar();
+        return;
+    }
+    
+    printf("⚠️  WARNING: This will permanently change your data order!\n");
+    printf("📋 Current product count: %d\n", productCount);
+    printf("💾 This change will be saved to your data file.\n");
+    printf("\n1. Sort Low to High\n");
+    printf("2. Sort High to Low\n");
+    printf("0. Cancel\n");
+    printf("\nEnter your choice: ");
+    
+    int sortChoice;
+    scanf("%d", &sortChoice);
+    getchar();
+    
+    if (sortChoice == 0) {
+        printf("❌ Sort operation cancelled.\n");
+        printf("Press any key to continue...");
+        getchar();
+        return;
+    }
+    
+    if (sortChoice != 1 && sortChoice != 2) {
+        printf("❌ Invalid choice!\n");
+        printf("Press any key to continue...");
+        getchar();
+        return;
+    }
+    
+    printf("\n🔄 Sorting products by price...\n");
+    
+    // Sort by price
+    for (int i = 0; i < productCount - 1; i++) {
+        for (int j = 0; j < productCount - i - 1; j++) {
+            double price1 = productCache[j].unitPrice * (1 - productCache[j].discountPercent / 100.0);
+            double price2 = productCache[j + 1].unitPrice * (1 - productCache[j + 1].discountPercent / 100.0);
+            
+            int shouldSwap = (sortChoice == 1) ? (price1 > price2) : (price1 < price2);
+            
+            if (shouldSwap) {
+                Product temp = productCache[j];
+                productCache[j] = productCache[j + 1];
+                productCache[j + 1] = temp;
+            }
+        }
+    }
+    
+    // Save to file
+    saveProductsFromCache();
+    
+    printf("✅ Products permanently sorted by price %s and saved!\n", 
+           (sortChoice == 1) ? "(Low→High)" : "(High→Low)");
+    printf("Press any key to continue...");
+    getchar();
+}
+
+
 
 // ============================================================================
 // REPORTS & ANALYTICS
